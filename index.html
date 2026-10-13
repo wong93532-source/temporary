@@ -15,50 +15,53 @@
             margin: 0;
             font-family: sans-serif;
         }
-        .container {
-            text-align: center;
-        }
-        img {
-            max-width: 90vw;
-            max-height: 80vh;
-            border-radius: 4px;
-        }
-        #expired {
-            display: none;
-            font-size: 24px;
-            color: #ff4d4d;
-        }
+        .container { text-align: center; }
+        img { max-width: 90vw; max-height: 80vh; border-radius: 4px; }
+        #expired { display: none; font-size: 24px; color: #ff4d4d; }
     </style>
 </head>
 <body>
     <div class="container" id="view-box">
-        <!-- Image source set to image.jpg -->
         <img src="image.jpg" alt="Photo" id="target-img">
         <p style="margin-top: 15px; color: #888; font-size: 14px;">Closing in <span id="countdown">3</span>s...</p>
     </div>
     <div id="expired">
-        <h2>Expired</h2>
-        <p>This view session has ended.</p>
+        <h2>Access Denied</h2>
+        <p id="error-msg">This link has expired or reached its view limit.</p>
     </div>
 
     <script>
-        let timeLeft = 3;
-        const countdownEl = document.getElementById('countdown');
+        // 检查本地浏览次数
+        let viewCount = localStorage.getItem('photo_view_count') || 0;
+        viewCount = parseInt(viewCount);
+
         const viewBox = document.getElementById('view-box');
         const expiredEl = document.getElementById('expired');
+        const errorMsg = document.getElementById('error-msg');
 
-        const timer = setInterval(() => {
-            timeLeft--;
-            countdownEl.textContent = timeLeft;
-            if (timeLeft <= 0) {
-                clearInterval(timer);
-                viewBox.style.display = 'none';
-                expiredEl.style.display = 'block';
-                try {
-                    window.close();
-                } catch (e) {}
-            }
-        }, 1000);
+        if (viewCount >= 3) {
+            // 如果超过3次，直接显示失效，不加载照片
+            viewBox.style.display = 'none';
+            expiredEl.style.display = 'block';
+            errorMsg.textContent = "You have reached the maximum view limit (3 times).";
+        } else {
+            // 没超过3次，次数加1，并开始3秒倒计时
+            localStorage.setItem('photo_view_count', viewCount + 1);
+            
+            let timeLeft = 3;
+            const countdownEl = document.getElementById('countdown');
+
+            const timer = setInterval(() => {
+                timeLeft--;
+                countdownEl.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    viewBox.style.display = 'none';
+                    expiredEl.style.display = 'block';
+                    try { window.close(); } catch (e) {}
+                }
+            }, 1000);
+        }
     </script>
 </body>
 </html>
