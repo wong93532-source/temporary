@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure View</title>
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+        }
+        .container {
+            text-align: center;
+        }
+        img {
+            max-width: 90vw;
+            max-height: 80vh;
+            border-radius: 4px;
+        }
+        #expired {
+            display: none;
+            font-size: 24px;
+            color: #ff4d4d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="view-box">
+        <!-- Image source set to image.jpg -->
+        <img src="image.jpg" alt="Photo" id="target-img">
+        <p style="margin-top: 15px; color: #888; font-size: 14px;">Closing in <span id="countdown">3</span>s...</p>
+    </div>
+    <div id="expired">
+        <h2>Expired</h2>
+        <p>This view session has ended.</p>
+    </div>
+
+    <script>
+        let timeLeft = 3;
+        const countdownEl = document.getElementById('countdown');
+        const viewBox = document.getElementById('view-box');
+        const expiredEl = document.getElementById('expired');
+
+        const timer = setInterval(() => {
+            timeLeft--;
+            countdownEl.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                viewBox.style.display = 'none';
+                expiredEl.style.display = 'block';
+                try {
+                    window.close();
+                } catch (e) {}
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
