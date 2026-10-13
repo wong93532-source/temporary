@@ -28,7 +28,7 @@
     </div>
 
     <div id="haha-box">
-        <h2>为了防止颜光心传播照片，达到限制了颜光心！哈哈哈哈哈哈哈哈哈🤣🤣🤣🤣</h2>
+        <h4>为了防止颜光心乱乱传播照片，达到限制了颜光心！哈哈哈哈哈哈哈哈哈哈哈🤣🤣🤣🤣👍👍👍🤣🤣✨</h4>
     </div>
 
     <div id="expired">
@@ -37,9 +37,10 @@
     </div>
 
     <script>
-        // 检查本地浏览次数
-        let viewCount = localStorage.getItem('photo_view_count') || 0;
-        viewCount = parseInt(viewCount);
+        // 获取当前的浏览次数
+        let viewCount = localStorage.getItem('photo_view_count');
+        viewCount = viewCount ? parseInt(viewCount) : 0;
+        console.log("Current view count before increment:", viewCount);
 
         const viewBox = document.getElementById('view-box');
         const hahaBox = document.getElementById('haha-box');
@@ -48,11 +49,13 @@
         const countdownEl = document.getElementById('countdown');
 
         if (viewCount >= 2) {
-            // 次数已用完（第3次及之后）：完全不显示照片，直接显示“达到限制了颜光心”
+            // 次数已经达到或超过 2 次（即第 3 次及之后）
+            // 确保绝对不显示照片容器
             viewBox.style.display = 'none';
+            // 显示限制提示
             hahaBox.style.display = 'block';
 
-            // 显示 1 秒后，切换到 Access Denied 并倒计时 5 秒关闭
+            // 1 秒后切换到 Access Denied 并倒计时 5 秒
             setTimeout(() => {
                 hahaBox.style.display = 'none';
                 expiredEl.style.display = 'block';
@@ -71,8 +74,10 @@
             }, 1000);
 
         } else {
-            // 还有浏览机会（第 1 次或第 2 次）：次数加 1，正常显示照片 2 秒后关闭
-            localStorage.setItem('photo_view_count', viewCount + 1);
+            // 还没到限制（第 1 次或第 2 次）：次数加 1，保存并正常显示照片 2 秒
+            viewCount += 1;
+            localStorage.setItem('photo_view_count', viewCount);
+            console.log("Updated view count:", viewCount);
             
             let timeLeft = 2;
             const timer = setInterval(() => {
