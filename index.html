@@ -18,7 +18,7 @@
         .container { text-align: center; }
         img { max-width: 90vw; max-height: 80vh; border-radius: 4px; }
         #expired { display: none; font-size: 24px; color: #ff4d4d; text-align: center; }
-        #haha-box { display: none; font-size: 36px; color: #ffeb3b; font-weight: bold; text-align: center; }
+        #haha-box { display: none; font-size: 28px; color: #ffeb3b; font-weight: bold; text-align: center; }
     </style>
 </head>
 <body>
@@ -28,7 +28,7 @@
     </div>
 
     <div id="haha-box">
-        <h2>为了防止颜光心传播照片</h2>
+        <h2>达到限制了颜光心</h2>
     </div>
 
     <div id="expired">
@@ -46,48 +46,32 @@
         const expiredEl = document.getElementById('expired');
         const errorMsg = document.getElementById('error-msg');
         const countdownEl = document.getElementById('countdown');
-        const denyCountdownEl = document.getElementById('deny-countdown');
 
         if (viewCount >= 2) {
-            // 超过 2 次：先照常显示照片，开始 2 秒倒计时
-            localStorage.setItem('photo_view_count', viewCount + 1);
-            let timeLeft = 2;
-            countdownEl.textContent = timeLeft;
+            // 次数已用完（第3次及之后）：完全不显示照片，直接显示“达到限制了颜光心”
+            viewBox.style.display = 'none';
+            hahaBox.style.display = 'block';
 
-            const timer = setInterval(() => {
-                timeLeft--;
-                countdownEl.textContent = timeLeft;
+            // 显示 1 秒后，切换到 Access Denied 并倒计时 5 秒关闭
+            setTimeout(() => {
+                hahaBox.style.display = 'none';
+                expiredEl.style.display = 'block';
+                errorMsg.innerHTML = 'This link has expired or reached its view limit.<br>Closing in <span id="deny-countdown">5</span>s...';
 
-                if (timeLeft === 1) {
-                    // 倒计时还剩 1 秒时，突然切换到“哈哈”
-                    viewBox.style.display = 'none';
-                    hahaBox.style.display = 'block';
-                }
-
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    // “哈哈”显示 1 秒后，切换到 Access Denied 并倒计时 5 秒
-                    setTimeout(() => {
-                        hahaBox.style.display = 'none';
-                        expiredEl.style.display = 'block';
-                        errorMsg.innerHTML = 'This link has expired or reached its view limit.<br>Closing in <span id="deny-countdown">5</span>s...';
-
-                        let denyTime = 5;
-                        const denyTimer = setInterval(() => {
-                            denyTime--;
-                            const currentDenyEl = document.getElementById('deny-countdown');
-                            if (currentDenyEl) currentDenyEl.textContent = denyTime;
-                            if (denyTime <= 0) {
-                                clearInterval(denyTimer);
-                                try { window.close(); } catch (e) {}
-                            }
-                        }, 1000);
-                    }, 1000);
-                }
+                let denyTime = 5;
+                const denyTimer = setInterval(() => {
+                    denyTime--;
+                    const currentDenyEl = document.getElementById('deny-countdown');
+                    if (currentDenyEl) currentDenyEl.textContent = denyTime;
+                    if (denyTime <= 0) {
+                        clearInterval(denyTimer);
+                        try { window.close(); } catch (e) {}
+                    }
+                }, 1000);
             }, 1000);
 
         } else {
-            // 没超过 2 次，次数加 1，正常 2 秒倒计时关闭
+            // 还有浏览机会（第 1 次或第 2 次）：次数加 1，正常显示照片 2 秒后关闭
             localStorage.setItem('photo_view_count', viewCount + 1);
             
             let timeLeft = 2;
