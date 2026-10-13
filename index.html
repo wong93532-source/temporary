@@ -28,52 +28,69 @@
     </div>
 
     <div id="haha-box">
-        <h2>为了防止你传播照片</h2>
+        <h2>哈哈</h2>
     </div>
 
     <div id="expired">
         <h2>Access Denied</h2>
-        <p style="font-size: 14px; color: #888;">Closing in <span id="deny-countdown">5</span>s...</p>
+        <p id="error-msg" style="font-size: 14px; color: #888;">Closing in <span id="deny-countdown">5</span>s...</p>
     </div>
 
     <script>
+        // 检查本地浏览次数
         let viewCount = localStorage.getItem('photo_view_count') || 0;
         viewCount = parseInt(viewCount);
 
         const viewBox = document.getElementById('view-box');
         const hahaBox = document.getElementById('haha-box');
         const expiredEl = document.getElementById('expired');
+        const errorMsg = document.getElementById('error-msg');
+        const countdownEl = document.getElementById('countdown');
         const denyCountdownEl = document.getElementById('deny-countdown');
 
         if (viewCount >= 2) {
-            // 超过 2 次，隐藏图片，先显示“哈哈”
-            viewBox.style.display = 'none';
-            hahaBox.style.display = 'block';
+            // 超过 2 次：先照常显示照片，开始 2 秒倒计时
+            localStorage.setItem('photo_view_count', viewCount + 1);
+            let timeLeft = 2;
+            countdownEl.textContent = timeLeft;
 
-            // 显示“哈哈” 1 秒后，切换到 Access Denied
-            setTimeout(() => {
-                hahaBox.style.display = 'none';
-                expiredEl.style.display = 'block';
+            const timer = setInterval(() => {
+                timeLeft--;
+                countdownEl.textContent = timeLeft;
 
-                // Access Denied 倒计时 5 秒后尝试关闭
-                let denyTime = 5;
-                const denyTimer = setInterval(() => {
-                    denyTime--;
-                    denyCountdownEl.textContent = denyTime;
-                    if (denyTime <= 0) {
-                        clearInterval(denyTimer);
-                        try { window.close(); } catch (e) {}
-                    }
-                }, 1000);
+                if (timeLeft === 1) {
+                    // 倒计时还剩 1 秒时，突然切换到“哈哈”
+                    viewBox.style.display = 'none';
+                    hahaBox.style.display = 'block';
+                }
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    // “哈哈”显示 1 秒后，切换到 Access Denied 并倒计时 5 秒
+                    setTimeout(() => {
+                        hahaBox.style.display = 'none';
+                        expiredEl.style.display = 'block';
+                        errorMsg.innerHTML = 'This link has expired or reached its view limit.<br>Closing in <span id="deny-countdown">5</span>s...';
+
+                        let denyTime = 5;
+                        const denyTimer = setInterval(() => {
+                            denyTime--;
+                            const currentDenyEl = document.getElementById('deny-countdown');
+                            if (currentDenyEl) currentDenyEl.textContent = denyTime;
+                            if (denyTime <= 0) {
+                                clearInterval(denyTimer);
+                                try { window.close(); } catch (e) {}
+                            }
+                        }, 1000);
+                    }, 1000);
+                }
             }, 1000);
 
         } else {
-            // 未超过 2 次，次数加 1，允许看 2 秒
+            // 没超过 2 次，次数加 1，正常 2 秒倒计时关闭
             localStorage.setItem('photo_view_count', viewCount + 1);
-
+            
             let timeLeft = 2;
-            const countdownEl = document.getElementById('countdown');
-
             const timer = setInterval(() => {
                 timeLeft--;
                 countdownEl.textContent = timeLeft;
